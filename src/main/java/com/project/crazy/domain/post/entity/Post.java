@@ -37,6 +37,12 @@ public class Post {
 
     @ColumnDefault("0")
     private int like;
+    public void increaseLike() {
+        this.like++;
+    }
+    public void decreaseLike() {
+        if(this.like > 0) this.like--;
+    }
 
     @CreationTimestamp
     private LocalDateTime createdAt;

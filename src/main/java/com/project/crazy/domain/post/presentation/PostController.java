@@ -40,4 +40,22 @@ public class PostController {
         return postService.getPostById(postId);
     }
 
+    @ApiOperation("게시글 좋아요 올리기")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/increase/{post-id}")
+    public void increaseLike(
+            @PathVariable("post-id") Long postId
+    ) {
+        postService.increaseLike(postId);
+    }
+
+    @ApiOperation("게시글 좋아요 내리기")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/decrease/{post-id}")
+    public void decreaseLike(
+            @PathVariable("post-id") Long postId
+    ) {
+        postService.decreaseLike(postId);
+    }
+
 }

@@ -65,4 +65,22 @@ public class PostService {
         return ResponseUtil.getPostResponse(post);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void increaseLike(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> {throw PostNotFoundException.EXCEPTION;});
+        post.increaseLike();
+
+        postRepository.save(post);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void decreaseLike(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> {throw PostNotFoundException.EXCEPTION;});
+        post.decreaseLike();
+
+        postRepository.save(post);
+    }
+
 }
