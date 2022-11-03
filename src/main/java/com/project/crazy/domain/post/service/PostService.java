@@ -9,6 +9,9 @@ import com.project.crazy.domain.post.presentation.dto.response.CreatePostRespons
 import com.project.crazy.domain.post.presentation.dto.response.PostListResponse;
 import com.project.crazy.domain.post.presentation.dto.response.PostResponse;
 import com.project.crazy.domain.post.repository.PostRepository;
+import com.project.crazy.domain.upload.entity.PostAttachment;
+import com.project.crazy.domain.upload.exception.AttachmentNotCoincidenceException;
+import com.project.crazy.domain.upload.repository.PostAttachmentRepository;
 import com.project.crazy.global.utils.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostAttachmentRepository postAttachmentRepository;
     private final UserFacade userFacade;
 
     @Transactional(rollbackFor = Exception.class)
@@ -33,6 +37,13 @@ public class PostService {
                 .location(request.getLocation())
                 .build();
         author.addPost(post);
+
+        if(!request.getAttachments().isEmpty()) {
+            List<PostAttachment> postAttachments = request.getAttachments().stream().map(id -> {
+                return postAttachmentRepository.findById(id).orElseThrow(() -> {throw AttachmentNotCoincidenceException.EXCEPTION;});
+            }).peek(attachment -> attachment.setPost(post)).collect(Collectors.toList());
+            post.addAttachments(postAttachments);
+        }
 
         return new CreatePostResponse(post.getPostId());
     }
