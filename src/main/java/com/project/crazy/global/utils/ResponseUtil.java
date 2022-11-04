@@ -12,7 +12,7 @@ public class ResponseUtil {
                 .postId(post.getPostId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .like(post.getLike())
+                .like(post.getLove())
                 .location(post.getLocation())
                 .createdAt(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(post.getCreatedAt()))
                 .build();
