@@ -27,8 +27,25 @@ public class PlaceService {
                                         .title(it.getTitle())
                                         .content(it.getContent())
                                         .imgUrl(it.getImgUrl())
+                                        .category(it.getCategory())
                                         .build()
                         ).collect(Collectors.toList())
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public PlaceListResponse getAllPlaceByCategory(String category) {
+        List<Place> list = placeRepository.findAllByCategory(category);
+
+        return new PlaceListResponse(
+                list.stream().map(it ->
+                        PlaceResponse.builder()
+                                .title(it.getTitle())
+                                .content(it.getContent())
+                                .imgUrl(it.getImgUrl())
+                                .category(it.getCategory())
+                                .build()
+                ).collect(Collectors.toList())
         );
     }
 

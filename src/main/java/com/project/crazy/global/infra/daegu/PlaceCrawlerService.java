@@ -27,6 +27,7 @@ public class PlaceCrawlerService {
             {"https://www.google.com/travel/things-to-do/see-all?dest_mid=%2Fm%2F01vskn&dest_state_type=sattd&dest_src=yts&q=%EB%8C%80%EA%B5%AC&ved=0CAAQ8IAIahcKEwj4rtf43Y_7AhUAAAAAHQAAAAAQfw&hl=ko-KR&gl=kr&rf=EtYBCggvbS8wOWNtcRIJ67CV66y86rSAMAwiugEKW2h0dHBzOi8vd3d3LmdzdGF0aWMuY29tL2ltYWdlcy9pY29ucy9tYXRlcmlhbC9zeXN0ZW1fZ20vMXgvYWNjb3VudF9iYWxhbmNlX2dtX2JsdWVfMjBkcC5wbmcSW2h0dHBzOi8vd3d3LmdzdGF0aWMuY29tL2ltYWdlcy9pY29ucy9tYXRlcmlhbC9zeXN0ZW1fZ20vMngvYWNjb3VudF9iYWxhbmNlX2dtX2JsdWVfMjBkcC5wbmcoAQ", "박물관"}
     };
     private final PlaceRepository placeRepository;
+    private static final String INFRA_FORMATTER = "https://www.google.com/travel/things-to-do/see-all?dest_mid=%2Fm%2F01vskn&dest_state_type=sattd&dest_src=yts&q=대구&ved=0CAAQ8IAIahcKEwj4rtf43Y_7AhUAAAAAHQAAAAAQfw&hl=ko-KR&gl=kr";
 
     @Getter @AllArgsConstructor
     @Builder @ToString
@@ -37,10 +38,9 @@ public class PlaceCrawlerService {
         private String category;
     }
 
-    public List<PlaceInfraResponse> parserData(String url, String name) {
-        log.info("url : " + url);
+    public List<PlaceInfraResponse> parserData() {
         try {
-            Document document = Jsoup.connect(url).get();
+            Document document = Jsoup.connect(INFRA_FORMATTER).get();
             Element body = document.body();
 
             List<Element> data = body.select(".kQb6Eb");
@@ -52,7 +52,7 @@ public class PlaceCrawlerService {
                                 .title(it.select(".skFvHc").text())
                                 .content(it.select(".nFoFM").text())
                                 .imageUrl(it.select(".R1Ybne").attr("data-src"))
-                                .category(name)
+                                .category("ALL")
                                 .build()
                 ).collect(Collectors.toList());
             }
@@ -66,17 +66,16 @@ public class PlaceCrawlerService {
 
     @Transactional(rollbackFor = Exception.class)
     public void execute() {
-        for (String[] url : urlList) {
-            List<PlaceInfraResponse> list = parserData(url[0], url[1]);
+            List<PlaceInfraResponse> list = parserData();
 
             List<Place> saveData = list.stream().map(it -> {
-                if (!placeRepository.findByTitle(it.getTitle()).isEmpty()) {
+                if (placeRepository.findByTitleAndContent(it.getTitle(), it.getContent()).isPresent()) {
                     return Place.builder()
-                            .placeId(placeRepository.findByTitle(it.getTitle()).get().getPlaceId())
+                            .placeId(placeRepository.findByTitleAndContent(it.getTitle(), it.getContent()).get().getPlaceId())
                             .title(it.getTitle())
                             .content(it.getContent())
                             .imgUrl(it.getImageUrl())
-                            .category(it.getCategory())
+                            .category(placeRepository.findByTitleAndContent(it.getTitle(), it.getContent()).get().getCategory())
                             .build();
                 } else {
                     return Place.builder()
@@ -88,9 +87,6 @@ public class PlaceCrawlerService {
                 }
             }).collect(Collectors.toList());
             placeRepository.saveAll(saveData);
-            log.info(url[1] + " 카테고리 저장");
-        }
-        log.info("전체 저장 성공");
     }
 
 }
