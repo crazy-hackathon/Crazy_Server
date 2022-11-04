@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,7 @@ public class PostService {
         Post post = Post.builder()
                 .title(request.getTitle()).content(request.getContent())
                 .location(request.getLocation())
+                .attachmentList(new ArrayList<>())
                 .build();
         author.addPost(post);
 

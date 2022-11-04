@@ -23,7 +23,7 @@ public class Post {
     private Long postId;
 
     @ManyToOne
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author")
     private User author;
     public void setAuthor(User author) {
         this.author = author;
@@ -36,12 +36,12 @@ public class Post {
     private String location;
 
     @ColumnDefault("0")
-    private int like;
+    private int love;
     public void increaseLike() {
-        this.like++;
+        this.love++;
     }
     public void decreaseLike() {
-        if(this.like > 0) this.like--;
+        if(this.love > 0) this.love--;
     }
 
     @CreationTimestamp
@@ -61,10 +61,11 @@ public class Post {
     }
 
     @Builder
-    public Post(String title, String content, String location, int like) {
+    public Post(String title, String content, String location, int love, List<PostAttachment> attachmentList) {
         this.title = title;
         this.content = content;
         this.location = location;
-        this.like = like;
+        this.love = love;
+        this.attachmentList = attachmentList;
     }
 }
