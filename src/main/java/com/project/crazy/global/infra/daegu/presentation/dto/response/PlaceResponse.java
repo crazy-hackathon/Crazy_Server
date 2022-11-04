@@ -11,5 +11,6 @@ public class PlaceResponse {
     private String title;
     private String content;
     private String imgUrl;
+    private String category;
 
 }
