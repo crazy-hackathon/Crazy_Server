@@ -2,6 +2,7 @@ package com.project.crazy.domain.auth.presentation;
 
 import com.project.crazy.domain.auth.presentation.dto.request.SignInRequest;
 import com.project.crazy.domain.auth.presentation.dto.request.SignUpRequest;
+import com.project.crazy.domain.auth.presentation.dto.response.SignUpResponse;
 import com.project.crazy.domain.auth.presentation.dto.response.UserSignInResponse;
 import com.project.crazy.domain.auth.service.AuthService;
 import io.swagger.annotations.ApiOperation;
@@ -19,10 +20,10 @@ public class AuthController {
     @ApiOperation("회원가입")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/sign-up")
-    public void signUp(
+    public SignUpResponse signUp(
             @RequestBody SignUpRequest request
     ) {
-        authService.signUp(request);
+        return authService.signUp(request);
     }
 
     @ApiOperation("로그인")
